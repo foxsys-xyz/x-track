@@ -1,0 +1,33 @@
+/* ./your-css-folder/styles.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Custom CSS
+*/
+
+.progress {
+  @apply w-80 h-1 rounded-full bg-gray-500 overflow-hidden;
+}
+
+.progress:after {
+  content: '';
+  @apply block w-80 h-1 bg-white;
+  animation: load 15s linear;
+}
+
+@keyframes load {
+  0% { width: 0; }
+  10% { width: 5%; }
+  20% { width: 15%; }
+  30% { width: 25%; }
+  40% { width: 30%; }
+  50% { width: 44%; }
+  60% { width: 50%; }
+  70% { width: 72%; }
+  80% { width: 84%; }
+  90% { width: 92%; }
+  100% { width: 100%; }
+}
