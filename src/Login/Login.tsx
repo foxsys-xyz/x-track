@@ -1,5 +1,5 @@
 import { IconActivity, IconChartArcs, IconLockOpen } from "@tabler/icons";
-import logo from '../Assets/logo.png';
+import logo from '../Assets/logo.svg';
 import valogo from '../Assets/valogo.png';
 
 function Login() {

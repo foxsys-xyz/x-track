@@ -43,9 +43,9 @@ async function setActivity() {
   }
 
   rpc.setActivity({
-    details: `IndiGo Virtual`,
-    state: 'authenticating with the airline...',
-    largeImageKey: 'foxsys-xyz-dark',
+    details: 'IndiGo Virtual',
+    state: 'briefing with dispatcher...',
+    largeImageKey: 'foxsys-xyz_discord_',
     largeImageText: 'v00.015-alpha',
     instance: false,
   });
@@ -56,7 +56,7 @@ rpc.on('ready', () => {
 
   setInterval(() => {
     setActivity();
-  }, 15e3);
+  }, 1000);
 });
 
 rpc.login({ clientId }).catch(console.error);

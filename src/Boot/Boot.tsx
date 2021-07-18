@@ -1,4 +1,4 @@
-import logo from '../Assets/logo.png';
+import logo from '../Assets/logo.svg';
 
 function Boot() {
   return (
