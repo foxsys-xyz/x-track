@@ -4,6 +4,11 @@
   "version": "v00.010-alpha",
   "description": "foxsys-xyz \\ state of the art ACARS tracking software ⚡",
   "main": ".webpack/main",
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",

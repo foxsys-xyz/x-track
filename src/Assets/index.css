@@ -31,3 +31,11 @@
   90% { width: 92%; }
   100% { width: 100%; }
 }
+
+.drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}

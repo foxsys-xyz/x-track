@@ -11,7 +11,7 @@ function Window() {
       case 'BOOT':
           setTimeout(() => {
             setState('LOGIN');
-          }, 15000);
+          }, 500);
           return <Boot />;
       case 'LOGIN':
           return <Login />;

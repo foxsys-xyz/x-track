@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Window from './Window/Window';
 import reportWebVitals from './reportWebVitals';
+import ActionBar from './ActionBar/ActionBar';
 
 ReactDOM.render(
   <React.StrictMode>
+    <ActionBar />
     <Window />
   </React.StrictMode>,
   document.getElementById('root')
