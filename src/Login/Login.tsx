@@ -9,7 +9,7 @@ function Login() {
 	const Y = new Date().getFullYear();
 	const pjson = require('../../package.json');
 
-	ipcRenderer.send('appLogin');
+	ipcRenderer.send('set-rpc-state', 'authenticating...');
 
 	return (
 		<div className="bg-black">

@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as DiscordRPC from 'discord-rpc';
-import { useState } from 'react';
 declare const MAIN_WINDOW_WEBPACK_ENTRY :string;
 
 let mainWindow :any;
@@ -46,37 +45,13 @@ app.on('activate', () => {
 const clientId = '828553327214198802';
 
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+rpc.login({ clientId: clientId }).catch(console.error);
 
-async function setActivity() {
-  if (!rpc || !mainWindow) {
-    return 'Something is Bad! 😢';
-  }
-
-  let status = 'starting u...';
-
-  ipcMain.on('appLogin', () => {
-    return status = 'security check...';
-  });
-
-  ipcMain.on('appDashboard', () => {
-    return status = 'briefing with dispatcher...';
-  });
-
-  rpc.setActivity({
-    details: 'IndiGo Virtual',
-    state: status,
-    largeImageKey: 'foxsys-xyz_discord_',
-    largeImageText: 'v00.015-alpha',
-    instance: false,
-  });
-}
-
-rpc.on('ready', () => {
-  setActivity();
-
-  setInterval(() => {
-    setActivity();
-  }, 15e3);
+ipcMain.on('set-rpc-state', (_, state: string) => {
+    rpc.setActivity({
+        details: 'IndiGo Virtual',
+        state,
+        largeImageKey: 'foxsys-xyz_discord_',
+        largeImageText: 'v00.015-alpha',
+      });
 });
-
-rpc.login({ clientId }).catch(console.error);

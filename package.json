@@ -1,7 +1,7 @@
 {
   "name": "x-track",
   "productName": "x-track",
-  "version": "v00.010-alpha",
+  "version": "v010.00-alpha",
   "description": "foxsys-xyz \\ state of the art ACARS tracking software ⚡",
   "main": ".webpack/main",
   "browser": {

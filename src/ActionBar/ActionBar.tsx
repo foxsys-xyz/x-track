@@ -4,11 +4,11 @@ import { IconArrowDownRight, IconX } from '@tabler/icons';
 function ActionBar() {
 
 	const closeWindow = () => {
-		return ipcRenderer.send('closeApp');
+		ipcRenderer.send('closeApp');
 	}
 
 	const minimizeWindow = () => {
-		return ipcRenderer.send('minimizeApp');
+		ipcRenderer.send('minimizeApp');
 	}
 
 	return (
