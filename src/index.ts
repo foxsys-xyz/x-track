@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
+import keytar from 'keytar';
 import * as DiscordRPC from 'discord-rpc';
 declare const MAIN_WINDOW_WEBPACK_ENTRY :string;
 
@@ -54,4 +55,19 @@ ipcMain.on('set-rpc-state', (_, state: string) => {
         largeImageKey: 'foxsys-xyz_discord_',
         largeImageText: 'v00.015-alpha',
       });
+});
+
+ipcMain.handle('get-token', async (event) => {
+  const result = await keytar.getPassword('x-track', 'token');
+  return result;
+})
+
+ipcMain.on('set-token', (event, token) => {
+  event.returnValue = keytar.setPassword('x-track', 'token', token);
+  console.log('token set!');
+});
+
+ipcMain.on('delete-token', (event) => {
+  keytar.deletePassword('x-track', 'token');
+  console.log('token deleted!');
 });
