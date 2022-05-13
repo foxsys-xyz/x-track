@@ -10,6 +10,7 @@ function createWindow() {
     width: 1530,
     height: 920,
     frame: false,
+    icon: __dirname + '/foxsys_xyz.ico',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

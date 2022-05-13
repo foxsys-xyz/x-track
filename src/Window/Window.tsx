@@ -3,7 +3,6 @@ import { ipcRenderer } from 'electron';
 import Boot from '../Boot/Boot';
 import Login from '../Login/Login';
 import Dashboard from '../Dashboard/Dashboard';
-import '../Assets/index.css';
 
 function Window() {
 	const [state, setState] = useState('BOOT');

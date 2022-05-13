@@ -46,7 +46,7 @@ function ActionBar() {
 	}
 
 	return (
-		<div className="z-40 w-full absolute top-0 flex items-center justify-end px-10 py-5 text-white drag">
+		<div className="z-50 w-full absolute top-0 flex items-center justify-end px-10 py-5 text-white drag">
 			<div className="flex items-center gap-3 no-drag">
 				<IconTrash onClick={deleteToken} className="w-4 hover:text-gray-300 transition duration-500 cursor-pointer" stroke={2} />
 				<IconArrowDownRight onClick={minimizeWindow} className="w-5 hover:text-gray-300 transition duration-500 cursor-pointer" stroke={2} />

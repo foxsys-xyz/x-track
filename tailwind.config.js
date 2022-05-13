@@ -1,4 +1,5 @@
 const colors = require('tailwindcss/colors');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   content: [
@@ -6,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+				'mono': ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
+			},
 			fontSize: {
 				sm: ['0.775rem', '1.15rem'],
 			},

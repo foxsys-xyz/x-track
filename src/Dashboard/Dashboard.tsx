@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { ipcRenderer } from 'electron';
 import logo from '../Assets/logo.svg';
 import axios from 'axios';
+import { IconInfoCircle, IconPlane, IconPoint, IconSmartHome } from '@tabler/icons';
+import mapboxgl from 'mapbox-gl';
 
 export type DataTypes = {
     username: string,
@@ -11,52 +13,115 @@ export type DataTypes = {
 }
 
 function Dashboard() {
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaGlhYXJ5YW4iLCJhIjoiY2tzZTl0ajJjMGgydjJwbnVuMG5tOXMxbiJ9.r5-7_9QXjVfz4hcg-yYM4w';
+    const mapContainer = useRef(null);
+    const map = useRef(null);
+    const [lng, setLng] = useState(-70.9);
+    const [lat, setLat] = useState(42.35);
+    const [zoom, setZoom] = useState(9);
+
 	ipcRenderer.send('set-rpc-state', 'in briefing room...');
 
-    let token: string;
+    let [data, setData] = useState({} as DataTypes);
     
-    const options = {
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
-        withCredentials: true,
+    const [spinner, setSpinner] = useState(true);  
+
+    const loadData = async (token: string) => {
+        await axios.get('http://api.foxsys.test/dashboard', {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            withCredentials: true,
+        })
+        .then(res => {
+            setData(res.data[0]);
+            setSpinner(false);
+        })
+        .catch(function (error) {
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                console.log(error.response.status);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+            };
+        });
     };
 
-    let [data, setData] = useState({} as DataTypes);
+    const init = async () => {
+        const token = await ipcRenderer.invoke('get-token');
+        loadData(token);
+    }
 
     useEffect(() => {
-        const loadData = async () => {
-            await axios.get('http://api.foxsys.test/user', options)
-            .then(res => {
-                setData(res.data);
-            })
-            .catch(function (error) {
-                if (error.response) {
-                    // Request made and server responded
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    console.log(error.request);
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    console.log('Error', error.message);
-                };
-            });
-        };
-        loadData();
+        init();
+
+        if (map.current) return; // initialize map only once
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current, // container ID
+            style: 'mapbox://styles/hiaaryan/ckwatwod05wdw14mvtj34e8nk', // style URL
+            center: [lng, lat], // starting position [lng, lat]
+            zoom: zoom, // starting zoom
+            attributionControl: false,
+        });
     }, []);
 
 	return (
-		<div className="font-mono h-screen flex items-center justify-center bg-black">
-			<div className="text-white text-center">
-				<img src={logo} className="h-28 flex mb-6 mx-auto" alt="logo" />
-				<h3 className="text-3xl">
-					Welcome {data ? data.fname : ''}.
-				</h3>
-				<span>{data ? data.email : ''}</span>
-			</div>
+		<div className="relative font-mono h-screen flex items-center justify-center bg-black">
+            {spinner && (
+                <div className="absolute h-screen w-screen flex items-center justify-center bg-black z-40">
+                    <IconPoint className="text-white w-5 animate-ping" stroke={2} />
+                </div>
+            )}
+
+            <div className="h-screen w-screen flex items-center justify-center z-30">
+                <div ref={mapContainer} className="h-full w-full"></div>
+            </div>
+
+            <div className="absolute left-10 flex items-center z-30 text-white">
+                <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-40 rounded-3xl shadow-2xl backdrop-filter backdrop-blur-sm">
+                    <div className="relative z-30 flex items-center justify-center">
+                        <a href="#" className="transition duration-150 flex items-center justify-center p-4 rounded-2xl text-sm hover:bg-gray-800 hover:bg-opacity-60">
+                            <IconSmartHome className="inline-block w-6" stroke={2} />
+                        </a>
+
+                        {/* <div className="relative flex items-center">
+                            <div className="whitespace-nowrap ml-8 bg-gray-900 bg-opacity-40 backdrop-filter backdrop-blur-sm rounded-xl absolute z-50 px-4 py-2 text-sm text-white">
+                                Dashboard
+                            </div>
+                        </div> */}
+                    </div>
+
+                    <div className="relative z-30 flex items-center justify-center">
+                        <a href="#" className="transition duration-150 flex items-center justify-center p-4 rounded-2xl text-sm hover:bg-gray-800 hover:bg-opacity-60">
+                            <IconPlane className="inline-block w-6" stroke={2} />
+                        </a>
+
+                        {/* <div className="relative flex items-center">
+                            <div className="whitespace-nowrap ml-8 bg-gray-900 bg-opacity-40 backdrop-filter backdrop-blur-sm rounded-xl absolute z-50 px-4 py-2 text-sm text-white">
+                                Dashboard
+                            </div>
+                        </div> */}
+                    </div>
+
+                    <div className="relative z-30 flex items-center justify-center">
+                        <a href="#" className="transition duration-150 flex items-center justify-center p-4 rounded-2xl text-sm hover:bg-gray-800 hover:bg-opacity-60">
+                            <IconInfoCircle className="inline-block w-6" stroke={2} />
+                        </a>
+
+                        {/* <div className="relative flex items-center">
+                            <div className="whitespace-nowrap ml-8 bg-gray-900 bg-opacity-40 backdrop-filter backdrop-blur-sm rounded-xl absolute z-50 px-4 py-2 text-sm text-white">
+                                Dashboard
+                            </div>
+                        </div> */}
+                    </div>
+                </div>
+            </div>
 		</div>
 	);
 }

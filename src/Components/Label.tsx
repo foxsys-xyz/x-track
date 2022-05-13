@@ -1,6 +1,7 @@
 interface LabelProps {
     className?: string,
     name?: string,
+    children?: React.ReactNode,
 }
 
 const Label:React.FC <LabelProps> = ({className, name, children}) => {
