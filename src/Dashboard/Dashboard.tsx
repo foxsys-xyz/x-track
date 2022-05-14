@@ -4,6 +4,7 @@ import logo from '../Assets/logo.svg';
 import axios from 'axios';
 import { IconInfoCircle, IconPlane, IconPoint, IconSmartHome } from '@tabler/icons';
 import mapboxgl from 'mapbox-gl';
+import Card from '../Components/Card';
 
 export type DataTypes = {
     username: string,
@@ -18,9 +19,7 @@ function Dashboard() {
     const map = useRef(null);
     const [lng, setLng] = useState(-70.9);
     const [lat, setLat] = useState(42.35);
-    const [zoom, setZoom] = useState(9);
-
-	ipcRenderer.send('set-rpc-state', 'in briefing room...');
+    const [zoom, setZoom] = useState(9);	
 
     let [data, setData] = useState({} as DataTypes);
     
@@ -36,6 +35,7 @@ function Dashboard() {
         })
         .then(res => {
             setData(res.data[0]);
+            console.log(res);
             setSpinner(false);
         })
         .catch(function (error) {
@@ -69,10 +69,21 @@ function Dashboard() {
             zoom: zoom, // starting zoom
             attributionControl: false,
         });
+
+        ipcRenderer.send('set-rpc-state', 'in briefing room...');
+
+        
+
+        ipcRenderer.on('mainprocess-response', (event, arg) => {
+            console.log('Got result: ', JSON.stringify(arg));
+            console.log(arg.latitude);
+            const lat = Number(arg.latitude);
+            const lng = Number(arg.longitude);
+        });
     }, []);
 
 	return (
-		<div className="relative font-mono h-screen flex items-center justify-center bg-black">
+		<div className="relative font-mono h-screen flex items-center justify-center bg-black overflow-hidden">
             {spinner && (
                 <div className="absolute h-screen w-screen flex items-center justify-center bg-black z-40">
                     <IconPoint className="text-white w-5 animate-ping" stroke={2} />
@@ -120,6 +131,21 @@ function Dashboard() {
                             </div>
                         </div> */}
                     </div>
+                </div>
+            </div>
+
+            <div className="absolute left-40 flex items-center z-30 text-white">
+                <div className="w-[40rem] p-8 bg-black bg-opacity-40 rounded-3xl shadow-2xl backdrop-filter backdrop-blur-sm">
+                    <h5 className="leading-3 font-medium inline-flex items-center">
+                        <IconSmartHome className="inline-block w-5 mr-3" stroke={2} />
+                        Dashboard
+                    </h5>
+                    <span className="text-gray-400 flex text-xs">map displays visual location of the airport</span>
+
+                    <p className="mt-6 text-xs">
+                        welcome, {data.fname} {data.lname}.
+                        you are logged in as {data.username}.
+                    </p>
                 </div>
             </div>
 		</div>

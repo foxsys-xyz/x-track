@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import keytar from 'keytar';
 import * as DiscordRPC from 'discord-rpc';
+import fsuipc = require('fsuipc');
 declare const MAIN_WINDOW_WEBPACK_ENTRY :string;
 
 let mainWindow :any;
@@ -71,4 +72,42 @@ ipcMain.on('set-token', (event, token) => {
 ipcMain.on('delete-token', (event) => {
   keytar.deletePassword('x-track', 'token');
   console.log('token deleted!');
+});
+
+const obj = new fsuipc.FSUIPC();
+
+ipcMain.handle('start-recording', async (event) => {
+  console.log('Starting recording...');
+  await obj.open()
+    .then(() => {
+      console.log('Link is open');
+
+      obj.add('clockHour', 0x238, fsuipc.Type.Byte);
+      obj.add('aircraftType', 0x3D00, fsuipc.Type.String, 256);
+      obj.add('latitude', 0x560, fsuipc.Type.Int64);
+      obj.add('longitude', 0x568, fsuipc.Type.Int64);
+      obj.process()
+        .then(value => {
+          event.sender.send('mainprocess-response', value);
+        })
+        .catch(err => {
+          event.sender.send('mainprocess-response', err);
+          return obj.close();
+        });
+
+      console.log('Recording has started');
+    })
+    .catch(err => {
+      console.error(err);
+
+      console.log('Recording has stopped');
+      event.sender.send('mainprocess-response', err);
+
+      return obj.close();
+    });
+});
+
+ipcMain.on('stop-recording', (event) => {
+  console.log('Stopping recording...');
+  obj.close().catch(err => console.error(err));
 });
