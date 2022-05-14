@@ -72,8 +72,6 @@ function Dashboard() {
 
         ipcRenderer.send('set-rpc-state', 'in briefing room...');
 
-        
-
         ipcRenderer.on('mainprocess-response', (event, arg) => {
             console.log('Got result: ', JSON.stringify(arg));
             console.log(arg.latitude);
