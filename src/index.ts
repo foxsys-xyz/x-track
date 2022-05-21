@@ -75,32 +75,38 @@ ipcMain.on('delete-token', (event) => {
 });
 
 const obj = new fsuipc.FSUIPC();
+let interval: NodeJS.Timeout;
 
 ipcMain.handle('start-recording', async (event) => {
-  console.log('Starting recording...');
+  console.log('starting connection process...');
   await obj.open()
     .then(() => {
-      console.log('Link is open');
+      console.log('link established to fsuipc...');
 
       obj.add('clockHour', 0x238, fsuipc.Type.Byte);
       obj.add('aircraftType', 0x3D00, fsuipc.Type.String, 256);
       obj.add('latitude', 0x560, fsuipc.Type.Int64);
       obj.add('longitude', 0x568, fsuipc.Type.Int64);
-      obj.process()
-        .then(value => {
-          event.sender.send('mainprocess-response', value);
-        })
-        .catch(err => {
-          event.sender.send('mainprocess-response', err);
-          return obj.close();
+      
+      interval = setInterval(function() {
+        obj.process()
+          .then(value => {
+              event.sender.send('mainprocess-response', value);
+          })
+          .catch(err => {
+            event.sender.send('mainprocess-response', err);
+            return obj.close();
         });
+      }, 15000);
 
-      console.log('Recording has started');
+      console.log('fsuipc recording started...');
     })
     .catch(err => {
       console.error(err);
 
-      console.log('Recording has stopped');
+      clearInterval(interval);
+
+      console.log('fsuipc recording stopped...');
       event.sender.send('mainprocess-response', err);
 
       return obj.close();
@@ -108,6 +114,6 @@ ipcMain.handle('start-recording', async (event) => {
 });
 
 ipcMain.on('stop-recording', (event) => {
-  console.log('Stopping recording...');
+  console.log('terminating connection to fsuipc...');
   obj.close().catch(err => console.error(err));
 });
