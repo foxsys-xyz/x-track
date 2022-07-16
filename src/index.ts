@@ -55,7 +55,7 @@ ipcMain.on('set-rpc-state', (_, state: string) => {
         details: 'IndiGo Virtual',
         state,
         largeImageKey: 'foxsys-xyz_discord_',
-        largeImageText: 'v00.015-alpha',
+        largeImageText: `v${process.env.npm_package_version}`,
       });
 });
 

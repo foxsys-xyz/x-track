@@ -16,7 +16,6 @@ function Login() {
 	const navigate = useNavigate();
 
 	const Y = new Date().getFullYear();
-	const pjson = require('../../package.json');
 
 	ipcRenderer.send('set-rpc-state', 'authenticating...');
 
@@ -36,7 +35,7 @@ function Login() {
 
 				<div className="flex items-center absolute bottom-0 right-0 px-10 py-5 text-xs">
 					<IconActivity className="w-4 mr-3 text-yellow-400" stroke={2} />
-					<span className="text-xs">x-track {pjson.version}.</span>
+					<span className="text-xs">x-track v{process.env.npm_package_version}.</span>
 				</div>
 
 				<div className="w-screen h-screen mx-auto flex justify-center items-center">

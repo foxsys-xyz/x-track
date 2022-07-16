@@ -8,18 +8,31 @@ import Profile from './Tabs/Profile';
 import Flight from './Tabs/Flight';
 import About from './Tabs/About';
 
-export type DataTypes = {
+type ProfileDataTypes = {
     username: string,
     fname: string,
     lname: string,
     email: string,
-}
+    avatar: string,
+    rwp: boolean,
+    hub: string,
+};
+
+type FlightDataTypes = {
+    airline_icao: string,
+    flightnum: string,
+    departure: string,
+    arrival: string,
+    type: string,
+    aircraft_icao: string,
+};
 
 type TabsType = {
-    label: any;
-    index: number;
-    Component: React.FC<{}>;
-}[];
+    label: any,
+    index: number,
+    data: any,
+    Component: React.FC<any>,
+} [];
 
 function Dashboard() {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGlhYXJ5YW4iLCJhIjoiY2tzZTl0ajJjMGgydjJwbnVuMG5tOXMxbiJ9.r5-7_9QXjVfz4hcg-yYM4w';
@@ -29,7 +42,8 @@ function Dashboard() {
     const [lat, setLat] = useState(42.35);
     const [zoom, setZoom] = useState(9);
 
-    let [data, setData] = useState({} as DataTypes);
+    let [profileData, setProfileData] = useState({} as ProfileDataTypes);
+    let [flightData, setFlightData] = useState({} as FlightDataTypes);
 
     const [spinner, setSpinner] = useState(false);
 
@@ -42,7 +56,8 @@ function Dashboard() {
             withCredentials: true,
         })
             .then(res => {
-                setData(res.data[0]);
+                setProfileData(res.data[0]);
+                setFlightData(res.data[2]);
                 setSpinner(false);
             })
             .catch(function (error) {
@@ -77,8 +92,6 @@ function Dashboard() {
             attributionControl: false,
         });
 
-        ipcRenderer.send('set-rpc-state', 'in briefing room...');
-
         ipcRenderer.invoke('start-recording');
 
         let tlat: any;
@@ -111,16 +124,19 @@ function Dashboard() {
         {
             label: <IconSmartHome className="inline-block w-6" stroke={2} />,
             index: 1,
+            data: profileData,
             Component: Profile,
         },
         {
             label: <IconPlane className="inline-block w-6" stroke={2} />,
             index: 2,
+            data: flightData,
             Component: Flight,
         },
         {
             label: <IconInfoCircle className="inline-block w-6" stroke={2} />,
             index: 3,
+            data: null,
             Component: About,
         }
     ];
@@ -128,7 +144,7 @@ function Dashboard() {
     const [selectedTab, setSelectedTab] = useState<number>(tabs[0].index);
 
     return (
-        <div className="relative font-mono h-screen flex items-center justify-center bg-black overflow-hidden">
+        <div className="relative font-mono h-screen flex items-center justify-center bg-gray-500 overflow-hidden">
             {spinner && (
                 <div className="absolute h-screen w-screen flex items-center justify-center bg-black z-40">
                     <IconPoint className="text-white w-5 animate-ping" stroke={2} />

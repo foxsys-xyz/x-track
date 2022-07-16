@@ -2,13 +2,14 @@ import { FC } from "react";
 
 type TabProps = {
 	tabs: {
-		label: string;
-		index: number;
-		Component: FC<{ index: number }>;
-	}[];
-	selectedTab: number;
-	onClick: (index: number) => void;
-	className?: string;
+		label: string,
+		index: number,
+		data: Object,
+		Component: FC<{ index: number, data: Object }>,
+	} [],
+	selectedTab: number,
+	onClick: (index: number) => void,
+	tabData?: Object,
 };
 
 /**
@@ -53,7 +54,7 @@ const Tab: FC<TabProps> = ({
 
 			<div className="absolute left-40 flex items-center z-30 text-white">
 				<div className="w-[40rem] p-8 bg-black bg-opacity-40 rounded-3xl shadow-2xl backdrop-filter backdrop-blur-sm">
-					{Panel && <Panel.Component index={selectedTab} />}
+					{Panel && <Panel.Component data={Panel.data} index={selectedTab} />}
 				</div>
 			</div>
 		</>
