@@ -8,7 +8,7 @@ const About: FC<{}> = () => {
 
 	return (
 		<div>
-			<h5 className="leading-3 font-medium inline-flex items-center">
+			<h5 className="leading-3 inline-flex items-center">
 				<IconInfoCircle className="inline-block w-5 mr-3" stroke={2} />
 				About
 			</h5>

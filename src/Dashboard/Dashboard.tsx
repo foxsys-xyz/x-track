@@ -27,6 +27,39 @@ type FlightDataTypes = {
     aircraft_icao: string,
 };
 
+type BookingDataTypes = {
+	active: boolean,
+	departure_at: any,
+	duration: any,
+	arrival_at: any,
+};
+
+type DepAirportTypes = {
+    icao: string,
+    iata: string,
+    airport_name: string,
+    city_name: string,
+    country: string,
+    continent: string,
+    elevation: number,
+    lat: number,
+    lng: number,
+    hub: boolean,
+};
+
+type ArrAirportTypes = {
+    icao: string,
+    iata: string,
+    airport_name: string,
+    city_name: string,
+    country: string,
+    continent: string,
+    elevation: number,
+    lat: number,
+    lng: number,
+    hub: boolean,
+};
+
 type TabsType = {
     label: any,
     index: number,
@@ -38,14 +71,17 @@ function Dashboard() {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGlhYXJ5YW4iLCJhIjoiY2tzZTl0ajJjMGgydjJwbnVuMG5tOXMxbiJ9.r5-7_9QXjVfz4hcg-yYM4w';
     const mapContainer = useRef(null);
     const map = useRef(null);
-    const [lng, setLng] = useState(-70.9);
-    const [lat, setLat] = useState(42.35);
-    const [zoom, setZoom] = useState(9);
+    const [lng, setLng] = useState(null);
+    const [lat, setLat] = useState(null);
+    const [zoom, setZoom] = useState(2.5);
 
     let [profileData, setProfileData] = useState({} as ProfileDataTypes);
     let [flightData, setFlightData] = useState({} as FlightDataTypes);
+    let [depAirportData, setDepAirportData] = useState({} as DepAirportTypes);
+    let [arrAirportData, setArrAirportData] = useState({} as ArrAirportTypes);
+    let [bookingData, setBookingData] = useState({} as BookingDataTypes);
 
-    const [spinner, setSpinner] = useState(false);
+    const [spinner, setSpinner] = useState(true);
 
     const loadData = async (token: string) => {
         await axios.get('http://api.foxsys.test/dashboard', {
@@ -55,33 +91,37 @@ function Dashboard() {
             },
             withCredentials: true,
         })
-            .then(res => {
-                setProfileData(res.data[0]);
-                setFlightData(res.data[2]);
-                setSpinner(false);
-            })
-            .catch(function (error) {
-                if (error.response) {
-                    // Request made and server responded
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    console.log(error.request);
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    console.log('Error', error.message);
-                };
-            });
+        .then(res => {
+            setProfileData(res.data[0]);
+            setBookingData(res.data[1]);
+            setFlightData(res.data[2]);
+            setDepAirportData(res.data[3]);
+            setArrAirportData(res.data[4]);
+            setSpinner(false);
+            setMap(res.data[3].lng, res.data[3].lat);
+        })
+        .catch(function (error) {
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                console.log(error.response.status);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+            };
+        });
     };
 
     const init = async () => {
         const token = await ipcRenderer.invoke('get-token');
-        loadData(token);
+        await loadData(token);
     }
 
     useEffect(() => {
-        // init();
+        init();
 
         if (map.current) return; // initialize map only once
         map.current = new mapboxgl.Map({
@@ -91,34 +131,18 @@ function Dashboard() {
             zoom: zoom, // starting zoom
             attributionControl: false,
         });
-
-        ipcRenderer.invoke('start-recording');
-
-        let tlat: any;
-        let tlng: any;
-        let title: string;
-
-        ipcRenderer.on('mainprocess-response', (event, arg) => {
-            const objectConstructor = ({}).constructor;
-
-            if (arg.constructor === objectConstructor) {
-                const calcDegreeLat =
-                    (arg.latitude) *
-                    (90.0 / (10001750.0 * 65536.0 * 65536.0));
-
-                const calcDegreeLng =
-                    (arg.longitude) *
-                    (360.0 / (65536.0 * 65536.0 * 65536.0 * 65536.0));
-
-                tlat = calcDegreeLat;
-                tlng = calcDegreeLng;
-
-                return console.log('Latitude: ' + calcDegreeLat + ' Longitude: ' + calcDegreeLng);
-            }
-
-            console.log(arg);
-        });
     }, []);
+
+    const setMap = async (lng: any, lat: any) => {
+        if (!map.current) return; // wait for map to initialize
+        map.current.on('load', () => {
+            map.current.flyTo({
+                center: [lng, lat],
+                zoom: 12.5,
+                offset: [300, 0],
+            });
+        });
+    }
 
     const tabs: TabsType = [
         {
@@ -130,7 +154,12 @@ function Dashboard() {
         {
             label: <IconPlane className="inline-block w-6" stroke={2} />,
             index: 2,
-            data: flightData,
+            data: {
+                booking: bookingData,
+                flight: flightData, 
+                departure: depAirportData,
+                arrival: arrAirportData,
+            },
             Component: Flight,
         },
         {
@@ -156,7 +185,6 @@ function Dashboard() {
             </div>
 
             <Tabs selectedTab={selectedTab} onClick={setSelectedTab} tabs={tabs} />
-
         </div>
     );
 }

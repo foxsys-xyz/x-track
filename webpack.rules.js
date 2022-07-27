@@ -10,7 +10,7 @@ module.exports = [
     use: {
       loader: "@timfish/webpack-asset-relocator-loader",
       options: {
-        outputAssetBase: "native_modules",
+        outputAssetBase: "/",
       },
     },
   },

@@ -53,7 +53,7 @@ const Tab: FC<TabProps> = ({
 			</div>
 
 			<div className="absolute left-40 flex items-center z-30 text-white">
-				<div className="w-[40rem] p-8 bg-black bg-opacity-40 rounded-3xl shadow-2xl backdrop-filter backdrop-blur-sm">
+				<div className="max-h-[500px] w-[40rem] p-8 bg-black bg-opacity-40 rounded-3xl shadow-2xl backdrop-filter backdrop-blur-sm">
 					{Panel && <Panel.Component data={Panel.data} index={selectedTab} />}
 				</div>
 			</div>
