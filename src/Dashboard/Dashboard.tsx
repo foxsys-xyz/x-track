@@ -139,7 +139,7 @@ function Dashboard() {
             map.current.flyTo({
                 center: [lng, lat],
                 zoom: 12.5,
-                offset: [300, 0],
+                offset: [325, 0],
             });
         });
     }

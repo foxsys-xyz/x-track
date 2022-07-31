@@ -1,7 +1,8 @@
-import { IconArrowsExchange, IconClock, IconExternalLink, IconInfoCircle, IconLink, IconPlane, IconPlaneArrival, IconPlaneDeparture, IconPoint, IconSatellite } from "@tabler/icons";
+import { IconAlertTriangle, IconArrowsExchange, IconArrowUpRight, IconClock, IconExternalLink, IconInfoCircle, IconLink, IconPlane, IconPlaneArrival, IconPlaneDeparture, IconPoint, IconSatellite } from "@tabler/icons";
 import { FC, useEffect, useState } from "react";
 import { ipcRenderer } from 'electron';
 import PrimaryButton from "../../Components/Buttons/PrimaryButton";
+import Modal from "../../Components/Modal";
 
 type TabsProps = {
 	data: {
@@ -55,12 +56,16 @@ type ArrAirportTypes = {
 };
 
 const Flight: FC<TabsProps> = (props) => {
-
-	ipcRenderer.send('set-rpc-state', 'briefing with dispatch...');
-	
+	const [isModalOpen, setModalIsOpen] = useState(false);	
 	const [flightProgress, setFlightProgress] = useState(0);
 
-	console.log(props.data);
+	const toggleModal = () => {
+		setModalIsOpen(!isModalOpen);
+	};
+
+	ipcRenderer.on('acars-data', (event, arg) => {
+		console.log('Got result: ', arg);
+	});
 
 	function distance(latd: number, lond: number, lata: number, lona: number, latc: number, lonc: number) {
 		const p = Math.PI/180;
@@ -103,8 +108,47 @@ const Flight: FC<TabsProps> = (props) => {
 		require("electron").shell.openExternal('http://cloud.foxsys.test/cfcdc');
 	}
 
+	useEffect(() => {
+		ipcRenderer.removeAllListeners('acars-error');
+
+		ipcRenderer.send('set-rpc-state', 'briefing with dispatch...');
+
+		ipcRenderer.on('acars-error', (event, error) => {
+			console.log('Got result: ', error);
+			toggleModal();
+			ipcRenderer.removeAllListeners('acars-data');
+		});
+	});
+
 	return (
 		<div>
+			{isModalOpen && 
+				<Modal onRequestClose={toggleModal}>
+					<div className="flex items-start">
+						<div className="mx-auto flex-shrink-0 flex items-center justify-start h-12 w-12 rounded-xl">
+							<IconAlertTriangle className="w-8 text-red-500" stroke={2} />
+						</div>
+						<div className="text-left">
+							<h3 className="mt-3 leading-6" id="modal-title">
+								couldn't connect to simulator
+							</h3>
+							<div className="mt-6">
+								<p className="text-xs text-gray-400">
+									x-track was not able to connect to an FSUIPC instance loaded within the simulator. please recheck, if your simulator
+									was started with fsuipc or not.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="mt-8 flex justify-end">
+						<PrimaryButton onClick={toggleModal} type="button">
+							understood 
+							<IconArrowUpRight className="inline-block w-5 ml-2" stroke={2} />
+						</PrimaryButton>
+					</div>
+				</Modal>
+			}
 			{(() => {
 				if (props.data && !!props.data.booking.active) {
 					return (

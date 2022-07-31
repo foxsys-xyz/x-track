@@ -52,12 +52,16 @@ const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 rpc.login({ clientId: clientId }).catch(console.error);
 
 ipcMain.on('set-rpc-state', (_, state: string) => {
+  try {
     rpc.setActivity({
         details: 'KLM Virtual',
         state,
         largeImageKey: 'foxsys-xyz_discord_',
         largeImageText: `v${process.env.npm_package_version}`,
       });
+  } catch (error) {
+    console.log('discord rpc failed to initialize...')
+  }
 });
 
 ipcMain.handle('get-token', async (event) => {
@@ -83,7 +87,7 @@ ipcMain.handle('init-acars-tracking', async (event) => {
   await fsuipc.init().then(() => {
     console.log('link established to fsuipc...');
 
-    fsuipc.listen(2000, [
+    fsuipc.listen(1000, [
       'latitude',
       'longitude',
       'gs',
@@ -91,8 +95,8 @@ ipcMain.handle('init-acars-tracking', async (event) => {
     ]).subscribe((result) => {
       event.sender.send('acars-data', JSON.stringify(result));
     });
-  }).catch((err) => {
-    event.sender.send('acars-error', err);
+  }).catch((error) => {
     console.log('fsuipc recording stopped...');
+    event.sender.send('acars-error', error);
   });
 });

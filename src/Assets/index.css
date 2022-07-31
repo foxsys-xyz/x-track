@@ -45,3 +45,18 @@
 .no-drag {
   -webkit-app-region: no-drag;
 }
+
+.modal__container {
+	background: #fff;
+	border-radius: 5px;
+	width: 100%;
+	margin: 50px auto;
+	padding: 15px;
+	width: 560px;
+}
+
+.modal__title {
+	font-size: 18px;
+	font-weight: 600;
+	margin-bottom: 25px;
+}
